@@ -1,24 +1,41 @@
 #SERVICE MANAGES - Copyright SOTRDATA 2014
 #Script de Collecte d'infos Commvault
-# $version : V1.0 
+# $version : V1.1
 # $initiate : 01/01/2014
-# $author : Firminhac Florian (florian.firminhac@stordata.fr)
+# $revision : 17/04/2014
+# $author : Firminhac Florian  (florian.firminhac@stordata.fr)
+
+$asupv2="C:\ASUPV2"
+$destination="D:\_Stordata\traitement-cv"
+$7z="$asupv2\7za.exe"
+
+
+ $directory=dir -Path $destination -Directory
+ foreach ($dir in $directory){
+
+ 
+  # on recupere le repertoire courant pour y enregistrer les fichiers 
+$rep = "$destination\$dir"
+
+If ( (Test-Path $rep\*RestoreJobSummaryReport*details.xls)) { 
+
+
 
 
 # on declare le repertoire ou les fichiers generés seront mis 
-$sources="sources"
+$sources="$destination\$dir\sources"
 
 # on verifie que le repertoire existe si non on le créé si oui on continue
-If (-not (Test-Path $sources)) { New-Item -ItemType Directory -Name $sources }
+If (-not (Test-Path $sources)) { New-Item -ItemType Directory -path $sources }
 
 # on recupere le repertoire courant pour y enregistrer les fichiers 
-$rep = (Get-Location).path
+$rep = "$destination\$dir"
 
 # on verifie si le fichier destination exite si oui on le supprime sinon on continue
 if(test-path $sources\11-resto.xlsx) {remove-item $sources\11-resto.xlsx}
 
 # on parse le fichier RestoreJobSummaryReport*details.xls généré par Commvault et on ne recupere que les lignes qui ont la colonne status ne contenant N/A
-$processes = Import-Csv RestoreJobSummaryReport*details.xls -delimiter "`t" 
+$processes = Import-Csv "$rep\*RestoreJobSummaryReport*details.xls" -delimiter "`t" 
 
 $Excel = New-Object -ComObject excel.application 
 $workbook = $Excel.workbooks.add() 
@@ -30,7 +47,7 @@ $workbook = $Excel.workbooks.add()
 # on cache la fenetre Excel 
 # on enregistre le fichier
 
-$xlout = "$($rep)\$sources\11-resto.xlsx"
+$xlout = "$sources\11-resto.xlsx"
 $i = 1 
 foreach($process in $processes) 
 { 
@@ -48,3 +65,9 @@ $Excel.visible = $false
 
 $Workbook.SaveAs($xlout, 51)
 $excel.Quit()
+
+}
+else 
+{ echo "pas de fichier *RestoreJobSummaryReport*details.xls present"}
+
+}
