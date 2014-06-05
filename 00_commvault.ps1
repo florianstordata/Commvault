@@ -29,8 +29,6 @@ while ($flagArchive=(Test-Path -Path $destination\$dir\* -Include *.cab))
 }
 
 
-#if ($date.DayOfWeek -eq "Monday") {
-
 echo "Execution du Script En_cours  (01/11)"
 & $scripts\01_en_cours.ps1
 echo "Execution du Script Events    (02/11)"
